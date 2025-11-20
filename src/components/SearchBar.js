@@ -1,11 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const SearchBar = ({ onSearch, placeholder = "Search..." }) => {
+const SearchBar = ({ onSearch, placeholder = "Search songs, artists..." }) => {
   const [query, setQuery] = useState('');
+  const debounceRef = useRef();
+
+  useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    if (query.trim().length > 2) {
+      debounceRef.current = setTimeout(() => {
+        onSearch(query);
+      }, 300);
+    } else if (query.trim().length === 0) {
+      onSearch('');
+    }
+  }, [query, onSearch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch(query);
+    if (query.trim()) {
+      onSearch(query);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
   };
 
   return (
@@ -13,9 +34,22 @@ const SearchBar = ({ onSearch, placeholder = "Search..." }) => {
       <input
         type="text"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={handleInputChange}
         placeholder={placeholder}
+        className="search-input-real-time"
       />
+      {query && (
+        <button 
+          type="button" 
+          className="clear-search"
+          onClick={() => {
+            setQuery('');
+            onSearch('');
+          }}
+        >
+          ✕
+        </button>
+      )}
     </form>
   );
 };

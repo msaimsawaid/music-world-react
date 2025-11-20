@@ -30,7 +30,6 @@ const GitHubSearch = () => {
 
   const handleInputChange = (e) => {
     setUsername(e.target.value);
-    // Clear results when input is cleared
     if (!e.target.value.trim()) {
       setUsers([]);
       setSearched(false);
